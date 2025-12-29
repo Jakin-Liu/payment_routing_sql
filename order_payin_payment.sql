@@ -1,0 +1,43 @@
+-- PayIn 支付记录表
+-- 用于记录支付渠道的支付详情信息
+
+CREATE TABLE `order_payin_payment` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `payment_order_id` varchar(128) NOT NULL COMMENT '支付订单唯一标识',
+  `transaction_id` varchar(128) NOT NULL COMMENT '支付系统全局交易号',
+  `merchant_order_id` varchar(128) NOT NULL COMMENT '商户订单号',
+  `channel_order_id` varchar(64) DEFAULT NULL COMMENT 'PSP/渠道返回订单号',
+  `merchant_user_id` varchar(64) DEFAULT NULL COMMENT '商户用户ID',
+  `real_currency` varchar(3) DEFAULT NULL COMMENT 'ISO 4217 货币代码',
+  `real_amount` double NOT NULL DEFAULT '0.00' COMMENT '实际的交易金额',
+  `psp` varchar(50) DEFAULT NULL COMMENT '支付平台',
+  `pay_method` varchar(32) DEFAULT NULL COMMENT 'card/token/wallet/bank_transfer/qr',
+  `pay_brand` varchar(64) DEFAULT NULL COMMENT '子渠道',
+  `psp_code` varchar(64) DEFAULT NULL COMMENT '渠道错误码，渠道返回',
+  `psp_msg` text DEFAULT NULL COMMENT '渠道返回错误信息',
+  `failure_code` varchar(32) DEFAULT NULL COMMENT '内部错误码，便于排查',
+  `failure_msg` text DEFAULT NULL COMMENT '用于客服/运营查看的失败原因',
+  `status` varchar(32) NOT NULL DEFAULT 'created' COMMENT '支付状态：created, processing, success, failed',
+  `country` varchar(32) DEFAULT NULL COMMENT '国家编码',
+  `notify_url` text DEFAULT NULL COMMENT '商户回调URL',
+  `confirm_at` int UNSIGNED NOT NULL DEFAULT '0' COMMENT '确认时间 与渠道交互成功的时间',
+  `success_at` int UNSIGNED NOT NULL DEFAULT '0' COMMENT '成功时间 支付系统确认支付成功的时间',
+  `fail_at` int UNSIGNED NOT NULL DEFAULT '0' COMMENT '失败时间 支付系统确认支付失败的时间',
+  `notify_at` int UNSIGNED NOT NULL DEFAULT '0' COMMENT '通知时间 向商户发送回调通知的时间',
+  `fee` json DEFAULT NULL COMMENT '手续费信息 JSON 结构',
+  `extra` json DEFAULT NULL COMMENT '额外的信息',
+  `user_info` json DEFAULT NULL COMMENT '跟支付商户的用户关联信息',
+  `description` varchar(256) DEFAULT NULL COMMENT '支付描述，用于支付页面展示',
+  `terminal_type` varchar(32) DEFAULT NULL COMMENT '终端类型',
+  `return_url` text DEFAULT NULL COMMENT '商户跳转地址URL',
+  `payment_url` text DEFAULT NULL COMMENT '商户跳转地址URL',
+  `expire_at` int UNSIGNED NOT NULL DEFAULT '0' COMMENT '过期时间',
+  `created_at` int UNSIGNED NOT NULL COMMENT '创建时间戳',
+  `updated_at` int UNSIGNED NOT NULL COMMENT '更新时间戳（自动更新）',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_payment_order_id` (`payment_order_id`),
+  KEY `idx_transaction_id` (`transaction_id`),
+  KEY `idx_merchant_order_id` (`merchant_order_id`),
+  KEY `idx_channel_order_id` (`channel_order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='PayIn 支付记录表，用于记录支付渠道的支付详情信息';
+
