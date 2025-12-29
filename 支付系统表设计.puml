@@ -1,0 +1,189 @@
+@startuml
+hide circle
+skinparam linetype ortho
+
+entity merchants {
+  *id : int <<PK>>
+  --
+  merchant_id : varchar(50) <<UK>>
+  merchant_name : varchar(100)
+  merchant_short_name : varchar(50)
+  country : varchar(10)
+  timezone : varchar(50)
+  contact_email : varchar(100)
+  contact_phone : varchar(20)
+  supported_currencies : json
+  status : tinyint
+  require_3ds : tinyint
+  is_deleted : tinyint
+  created_at : int
+  updated_at : int
+}
+
+' 商户API密钥表
+entity merchant_api_keys {
+  *id : int <<PK>>
+  --
+  merchant_id : varchar(50)
+  app_id : varchar(100)
+  api_key : varchar(128) <<UK>>
+  secret_key_enc : varchar(255)
+  website : varchar(200)
+  notify_url : varchar(500)
+  description : varchar(500)
+  status : tinyint
+  created_at : int
+  updated_at : int
+}
+
+' 支付品牌配置表
+entity merchant_payment_brand_configs {
+  *id : int <<PK>>
+  --
+  payment_brand_config_uuid : varchar(36) <<UK>>
+  merchant_id : varchar(50)
+  payment_brand : varchar(50)
+  min_amount : decimal(10,2)
+  max_amount : decimal(10,2)
+  is_enabled : tinyint
+  created_at : int
+  updated_at : int
+}
+
+' PSP配置表
+entity merchant_psp_configs {
+  *id : int <<PK>>
+  --
+  payment_brand_config_uuid : varchar(36)
+  psp_name : varchar(50)
+  mid : varchar(100)
+  mid_name : varchar(100)
+  card_qualification : varchar(100)
+  is_enabled : tinyint
+  created_at : int
+  updated_at : int
+}
+
+entity order_payin {
+  id : int <<PK>>
+  --
+  transaction_id : varchar(64) <<UK>>
+  merchant_id : varchar(64)
+  merchant_order_id : varchar(128)
+  channel_order_id : varchar(128)
+  payment_order_id : varchar(128)
+  real_currency : varchar(3)
+  real_amount : decimal(15,2)
+  usd_amount : decimal(15,2)
+  pay_method : varchar(32)
+  pay_brand : varchar(64)
+  psp : varchar(64)
+  status : varchar(32)
+  failure_code : varchar(32)
+  failure_msg : text
+  psp_code : varchar(64)
+  psp_msg : text
+  notify_url : text
+  return_url: text
+  payment_url: text
+  extra : json
+  country : varchar(2)
+  token : varchar(255)
+  
+  mark : varchar(512)
+  
+  webhook_status: varchar(64)
+  webhook_times: int
+
+  fail_at: int
+  confirm_at : int
+  success_at: int
+  refund_at : int
+  created_at : int
+  updated_at : int
+}
+
+
+
+entity order_payin_payment {
+  id : int <<PK>>
+  --
+  payment_order_id: varchar(128)<<UK>>
+  transaction_id : varchar(128)
+  merchant_order_id : varchar(128)
+  channel_order_id: varchar(64)
+  real_currency : varchar(3)
+  real_amount : decimal(15,2)
+  psp : varchar(50)
+  pay_method : varchar(32)
+  pay_brand : varchar(64)
+  psp_code : varchar(64)
+  psp_msg : text
+  failure_code : varchar(32)
+  failure_msg : text
+  status: varchar(32)
+  psp_status: varchar(32)
+  country: varchar(32)
+  notify_url: text
+
+  confirm_at: int 
+  success_at: int
+  fail_at: int
+  notify_at: int
+  fee.amount: decimal(15,2)
+  fee.currency: decimal(15,2)
+  fee.url: text
+  
+  
+  created_at : int
+  updated_at : int
+}
+
+entity order_payin_webhook_log {
+  id : int <<PK>>
+  --
+  marchant_id: varchar(128)
+  transaction_id : varchar(128)
+  merchant_order_id : varchar(128)
+  channel_order_id: varchar(64)
+
+ notify_url: text
+ params: json
+ headers: json
+ status: varchar(64)
+
+ request_at: int
+ response_at: int
+ use_time: int
+ response: json
+
+  created_at : int
+  updated_at : int
+}
+
+entity order_payin_psp_webhook_log {
+  id : int <<PK>>
+  --
+  transaction_id : varchar(128)
+  merchant_order_id : varchar(128)
+  channel_order_id: varchar(64)
+  payment_order_id: varchar(128)
+  psp: varchar(64)
+  payload : json
+  code: varchar(20)
+  status: varchar(20)
+  
+  notify_at : int
+  created_at : int
+  updated_at : int
+}
+
+
+merchants ||--o{ merchant_api_keys : "merchant_id"
+merchants ||--o{ merchant_payment_brand_configs : "merchant_id"
+merchant_payment_brand_configs ||--o{ merchant_psp_configs : "payment_brand_config_uuid"
+merchants ||--o{ order_payin : "merchant_id"
+order_payin ||--o{ order_payin_payment : transaction_id
+order_payin_payment ||--o{ order_payin_psp_webhook_log : channel_order_id
+order_payin ||--o{ order_payin_webhook_log : transaction_id
+@enduml
