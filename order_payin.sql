@@ -17,7 +17,7 @@ CREATE TABLE `order_payin` (
   `country` varchar(50) DEFAULT NULL COMMENT '国家编码',
   `channel_order_id` varchar(128) DEFAULT NULL COMMENT 'PSP/渠道返回订单号',
   `merchant_user_id` varchar(64) DEFAULT NULL COMMENT '商户用户ID',
-  `status` varchar(32) NOT NULL DEFAULT 'created' COMMENT '支付状态 Created, Processing, Success, Failed',
+  `status` varchar(32) NOT NULL DEFAULT 'created' COMMENT '支付状态',
   `failure_code` varchar(32) DEFAULT NULL COMMENT '内部错误码，便于排查',
   `failure_msg` text DEFAULT NULL COMMENT '用于客服/运营查看的失败原因',
   `psp_code` varchar(64) DEFAULT NULL COMMENT '渠道错误码，渠道返回',
@@ -42,5 +42,20 @@ CREATE TABLE `order_payin` (
   UNIQUE KEY `idx_transaction_id` (`transaction_id`),
   KEY `idx_merchant_order_id` (`merchant_order_id`),
   KEY `idx_channel_order_id` (`channel_order_id`),
-  KEY `idx_payment_order_id` (`payment_order_id`)
+  KEY `idx_payment_order_id` (`payment_order_id`),
+  KEY `idx_created_at_status_merchant_id_country` (`created_at`, `status`, `merchant_id`, `country`),
+  KEY `idx_created_at_psp_pay_method_pay_brand_real_currency` (`created_at`, `psp`, `pay_method`, `pay_brand`, `real_currency`),
+  KEY `idx_created_at_failure_code_created_at` (`created_at`, `failure_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='PayIn 交易表';
+
+
+ALTER TABLE order_payin
+  MODIFY COLUMN `real_amount` DECIMAL(10,2) NOT NULL DEFAULT '0.00' COMMENT '实际的交易金额',
+  MODIFY COLUMN `usd_amount` DECIMAL(10,2) NOT NULL DEFAULT '0.00' COMMENT '美元计价金额',
+  ADD COLUMN `deeplink_token` VARCHAR(256) NULL COMMENT 'deeplink token',
+  ADD COLUMN `deeplink_url` TEXT NULL COMMENT 'deeplink url';
+
+
+
+ALTER TABLE order_payin
+RENAME COLUMN deeplink_token TO link_token;

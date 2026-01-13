@@ -41,3 +41,12 @@ CREATE TABLE `order_payin_payment` (
   KEY `idx_channel_order_id` (`channel_order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='PayIn 支付记录表，用于记录支付渠道的支付详情信息';
 
+
+ALTER TABLE order_payin_payment
+  MODIFY COLUMN `real_amount` DECIMAL(10,2) NOT NULL DEFAULT '0.00' COMMENT '实际的交易金额',
+  ADD COLUMN deeplink_token VARCHAR(256) NULL COMMENT 'deeplink token',
+  ADD COLUMN deeplink_url text NULL COMMENT 'deeplink url';
+
+
+ALTER TABLE order_payin_payment
+RENAME COLUMN deeplink_token TO link_token;

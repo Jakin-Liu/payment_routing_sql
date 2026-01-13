@@ -10,3 +10,8 @@ CREATE TABLE `order_payin_psp_webhook_log` (
   KEY `idx_payment_order_id` (`payment_order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='PayIn PSP Webhook 日志表，用于记录 PSP 发送的 webhook 回调日志';
 
+
+ALTER TABLE order_payin_psp_webhook_log 
+MODIFY COLUMN notify_at BIGINT UNSIGNED NOT NULL COMMENT '通知时间';
+
+
