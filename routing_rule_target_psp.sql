@@ -10,7 +10,5 @@ CREATE TABLE IF NOT EXISTS `routing_rule_target_psp` (
   `created_at` int UNSIGNED NOT NULL COMMENT '创建时间戳',
   `updated_at` int UNSIGNED NOT NULL COMMENT '更新时间戳',
   PRIMARY KEY (`id`),
-  KEY `idx_rule_action_id` (`rule_action_id`),
-  KEY `idx_psp` (`psp`),
-  KEY `idx_status` (`status`)
+  KEY `idx_rule_action_id` (`rule_action_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='路由规则目标PSP表';
